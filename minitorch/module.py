@@ -31,13 +31,21 @@ class Module:
 
     def train(self) -> None:
         "Set the mode of this module and all descendent modules to `train`."
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        def update_training(module: Module) -> None:
+            module.training = True
+            for modules in module.__dict__["_modules" ].values():
+                update_training(modules)
+        update_training(self)
+            
 
     def eval(self) -> None:
         "Set the mode of this module and all descendent modules to `eval`."
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        def update_eval(module: Module) -> None:
+            module.training = False
+            for modules in module.__dict__["_modules" ].values():
+                update_eval(modules)
+        update_eval(self)
+
 
     def named_parameters(self) -> Sequence[Tuple[str, Parameter]]:
         """
@@ -47,13 +55,26 @@ class Module:
         Returns:
             The name and `Parameter` of each ancestor parameter.
         """
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        res = {}
+        def helper(name, node) :
+            prefix = name + "." if name else ""
+            for k, v in node._parameters.items() :
+                res [ prefix + k] = v
+            for k, v in node._modules.items() :
+                helper ( prefix + k, v)
+        
+        helper ("" , self )
+        return res
+
 
     def parameters(self) -> Sequence[Parameter]:
         "Enumerate over all the parameters of this module and its descendents."
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        def return_params(module: Module) -> Sequence[Parameter]:
+            res = list(module._parameters.values())
+            for submodule in module._modules.values():
+                res.extend(return_params(submodule))
+            return res
+        return return_params(self)
 
     def add_parameter(self, k: str, v: Any) -> Parameter:
         """

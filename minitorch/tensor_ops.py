@@ -264,8 +264,26 @@ def tensor_map(
         in_shape: Shape,
         in_strides: Strides,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError('Need to implement for Task 2.3')
+        # # simple version, assuming `out_shape` and `in_shape`are the same size.
+        # for i in range(len(in_storage)):
+        #     out[i] = fn(in_storage[i])
+
+        # broadcasted version
+        # assert len(in_shape) < len(out_shape)
+        # useful functions:
+        # broadcast_index,
+        # index_to_position,
+        # to_index,
+        out_index = np.zeros(len(out_shape), dtype=np.int32)
+        b_index = np.zeros(len(in_shape), dtype=np.int32)
+
+        for i in range(len(out)):
+            to_index(i, out_shape,out_index)
+            broadcast_index(out_index, out_shape, in_shape, b_index)
+
+            # b_index is the generated broadcast_index
+            b_position = index_to_position(b_index, in_strides)
+            out[i] = fn(in_storage[b_position])
 
     return _map
 
@@ -309,8 +327,29 @@ def tensor_zip(
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError('Need to implement for Task 2.3')
+        # simple version
+        # Assume out_shape and a_shape are in the same size
+        # for i in range(len(a_storage)):
+        #     out[i] = fn(a_storage[i], b_storage[i])
+
+        # broadcasted version
+        # assert len(a_shape) < len(out_shape) and len(b_shape) < len(out_shape)
+        # useful functions:
+        # broadcast_index,
+        # index_to_position,
+        # to_index,
+        out_index = np.zeros(len(out_shape), dtype=np.int32)
+        brc_a_index = np.zeros(len(a_shape), dtype=np.int32)
+        brc_b_index = np.zeros(len(b_shape), dtype=np.int32)
+
+        for i in range(len(out)):
+            to_index(i,out_shape,out_index)
+            broadcast_index(out_index, out_shape, a_shape, brc_a_index)
+            broadcast_index(out_index, out_shape, b_shape, brc_b_index)
+
+            brc_a_position = index_to_position(brc_a_index, a_strides)
+            brc_b_position = index_to_position(brc_b_index, b_strides)
+            out[i] = fn(a_storage[brc_a_position], b_storage[brc_b_position])
 
     return _zip
 
@@ -340,9 +379,17 @@ def tensor_reduce(
         a_strides: Strides,
         reduce_dim: int,
     ) -> None:
-        # TODO: Implement for Task 2.3.
-        raise NotImplementedError('Need to implement for Task 2.3')
+        out_index = np.zeros(len(out_shape), dtype=np.int32)
+        a_index = np.zeros(len(a_shape), dtype=np.int32)
 
+        for i in range(len(out)):
+            to_index(i,out_shape,out_index)
+            o_position = index_to_position(out_index , out_strides)
+            for j in range(a_shape[reduce_dim]) :
+                a_index = out_index.copy()
+                a_index[reduce_dim] = j
+                a_position = index_to_position(a_index, a_strides)
+                out[o_position] = fn(a_storage[a_position], out[o_position])
     return _reduce
 
 

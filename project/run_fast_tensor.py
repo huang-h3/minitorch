@@ -47,8 +47,11 @@ class Linear(minitorch.Module):
 
     def forward(self, x):
         # ASSIGN3.5
-        batch, in_size = x.shape
-        return x.view(batch, in_size) @ self.weights.value + self.bias.value
+        batch_size, in_size = x.shape
+        w = self.weights.value
+        b = self.bias.value
+        return x @ w + b
+
         # END ASSIGN3.5
 
 

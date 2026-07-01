@@ -24,4 +24,7 @@ from .tensor_functions import *  # noqa: F401,F403
 from .tensor_ops import *  # noqa: F401,F403
 from .testing import MathTest, MathTestVariable  # type: ignore # noqa: F401,F403
 
+# CUDA_CONV
+from .cuda_conv import Conv1dFunCuda, Conv2dFunCuda
+
 version = "0.4"
